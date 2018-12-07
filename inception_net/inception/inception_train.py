@@ -363,27 +363,16 @@ def train(dataset):
     '''
     #tf.train.write_graph(tf.get_default_graph(), "model/", "inception.pb", as_text=True)
 
-    #random cut
-    graph_def = tf.get_default_graph().as_graph_def()
-    i = 0
-    #for node in graph.get_operations():
-    for node in graph_def.node:
-      if i == len(hosts):
-          i = 0
-      if "batch_processing" in node.name:
-          node.device = "/job:worker/task:0"
-      else:          
-          node.device = "/job:worker/task:" + str(i)
-      i += 1
-
-    tf.import_graph_def(graph_def,name='')
+    #device placement
+    graph = tf.get_default_graph()
+    simulate.simulate(graph, 'topo', True, 4)
 
     print("hey good here")
 
     summary_writer = tf.summary.FileWriter("./dist_inception_logs")
     summary_writer.add_graph(tf.get_default_graph())
 
-    tf.train.write_graph(tf.get_default_graph(), "model/", "new_inception.pb", as_text=True)
+    #tf.train.write_graph(tf.get_default_graph(), "model/", "new_inception.pb", as_text=True)
 
 
     # Create a "supervisor", which oversees the training process.
@@ -419,8 +408,8 @@ def train(dataset):
                       'sec/batch)')
           print(format_str % (datetime.now(), step, loss_value,
                             examples_per_sec, duration))
-        if (step == 1):
-          fetched_timeline = timeline.Timeline(run_metadata.step_stats)
+
+        if step == 1 and not os.path.isfile('timeline.json') and not os.path.isfile('timeline_memory.json'):                 fetched_timeline = timeline.Timeline(run_metadata.step_stats)
           chrome_trace = fetched_timeline.generate_chrome_trace_format()
           with open('timeline2.json', 'w') as f:
             f.write(chrome_trace)

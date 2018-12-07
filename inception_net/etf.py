@@ -38,7 +38,7 @@ def etf(_G, _P, max_size):
 
 			
 			it = 0
-			for it in xrange(len(R_list)):
+			for it in range(len(R_list)):
 				t = G.nodes[R_list[it][0][0]]
 				p = P.nodes[R_list[it][0][1]]
 				e = max(CM, R_list[it][1])
@@ -134,15 +134,6 @@ def etf(_G, _P, max_size):
 		print(''.join(['P', str(key), ': ', str(node[key]), ' nodes, ', str(comp[key]), ' microseconds, ', str(memo[key]), ' bytes']))
 	
 	return G,span
-
-
-
-
-
-
-
-
-
 
 
 

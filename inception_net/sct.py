@@ -1,9 +1,8 @@
-
 import networkx as nx
 import scipy as sc
 from scipy.optimize import linprog
 from etf import etf 
-from cylp.cy import CyClpSimplex
+#from cylp.cy import CyClpSimplex
 from cvxopt import spmatrix, matrix, solvers
 
 def to_float(arr):
@@ -23,7 +22,6 @@ def small_example():
 	G.add_node(5, weight=4, favor=-1, parent= 0, id=5)
 	G.add_node(6, weight=3, favor=-1, parent= 0, id=6)
 	G.add_node(7, weight=4, favor=-1, parent= 0, id=7)
-
 	G.add_edge(1, 3, weight=2, id=1)
 	G.add_edge(1, 4, weight=3, id=2)
 	G.add_edge(2, 4, weight=2, id=3)
@@ -123,7 +121,7 @@ def sct(_G, _P, max_size):
 				t = G.nodes[pre]['t']
 				p = G.nodes[pre]['weight']
 				c = G[pre][T]['weight']
-				u_time = max(r_time, t + p + c)
+				u_time = max(u_time, t + p + c)
 			urgent[T] = u_time
 	
 		#calculate state of processor
@@ -244,12 +242,12 @@ def lp(G):
 	RHS = []	
 	#rule 1
 	row_count = 0
-	for i in xrange(num_edge):
+	for i in range(num_edge):
 		append_val(i, row_count, 1, LHS_VAL, LHS_I, LHS_J)
 		RHS.append(1)
 		row_count += 1
 		
-	for i in xrange(num_edge):
+	for i in range(num_edge):
 		#eq = [0]*(num_node + num_edge + 1)
 		#eq[i] = -1
 		#LHS.append(eq)
@@ -260,7 +258,7 @@ def lp(G):
 	#bound_e = [(0,1)] * num_edge
 	
 	#rule 2
-	for i in xrange(num_node):
+	for i in range(num_node):
 		#eq = [0]*(num_node + num_edge + 1)
 		#eq[num_edge + i] = -1
 		#LHS.append(eq)
@@ -333,12 +331,13 @@ def lp(G):
 	#print "LHS", LHS.size
 	#print "RHS", RHS
 	#print "bounds", bound
-	print "hello solver!"
+	print("hello solver!")
 	solvers.options['maxiters'] = 10000
 	solvers.options['refinement'] = 1
 	res = solvers.lp(goal, LHS, RHS, solver='mosek')
 
-	# res = sc.optimize.linprog(goal, A_ub=LHS, b_ub=RHS, bounds=bound, method='interior-point')
+	print("goodbye solver!")
+        # res = sc.optimize.linprog(goal, A_ub=LHS, b_ub=RHS, bounds=bound, method='interior-point')
 	#print(res)
 	#print res
 	#print res['x']
@@ -360,30 +359,3 @@ def lp(G):
 #	print(G.nodes[g])
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	

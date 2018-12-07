@@ -6,13 +6,22 @@ import math
 
 def topo(G, P, max_size):
     sorted_nodes = list(networkx.topological_sort(G))
+
+    i = 1
+    for node in sorted_nodes:
+        if i > len(P):
+            i = 1
+        G.nodes[node]['p'] = i
+        i += 1
+
+    '''
     num_proc = len(P)
     num_nodes = G.number_of_nodes()
     nodes_per_proc = int(math.ceil(float(num_nodes)/num_proc))
 
     lo = 0
     hi = 0
-    for num in xrange(num_proc):
+    for num in range(num_proc):
         curr_mem = 0
         hi = min(num_nodes, nodes_per_proc*(num+1))
         for ID in range(lo, hi, 1):
@@ -23,19 +32,19 @@ def topo(G, P, max_size):
         for ID in range(lo, hi, 1):
             curr_id = sorted_nodes[ID]
             G.nodes[curr_id]['p'] = num+1
-	lo = hi
-    for ID in xrange(num_nodes):
+    lo = hi
+    for ID in range(num_nodes):
         curr_id = sorted_nodes[ID]
         if (G.in_degree(curr_id) == 0):
             G.nodes[curr_id]['s'] = 0.0
         else:
             G.nodes[curr_id]['s'] = float('inf')
-    for PID in xrange(num_proc):
+    for PID in range(num_proc):
         P.nodes[PID+1]['t'] = 0.0
 
     makespan = 0
     task_list = {}
-    for ID in xrange(num_nodes):
+    for ID in range(num_nodes):
         curr_id = sorted_nodes[ID]    
         curr_node = G.nodes[curr_id]
         pred = list(G.predecessors(curr_id))
@@ -56,5 +65,28 @@ def topo(G, P, max_size):
         curr_node['s'] = max(start_time, P.nodes[curr_node['p']]['t'])
         P.nodes[curr_node['p']]['t'] = curr_node['s'] + curr_node['weight']
         makespan = max(makespan, P.nodes[curr_node['p']]['t'])
-    print "makespan: ", makespan, "miliseconds"
-    return G, makespan
+    print("makespan: ", makespan, "miliseconds")
+    '''
+    '''
+    span = 0
+    for T in G.nodes():
+        t = G.nodes[T]['t'] + G.nodes[T]['weight']
+        span = max(span, t)
+    print(''.join(['makespan: ', str(span), ' microseconds']))
+    '''
+    node = {}
+    comp = {}
+    memo = {}
+    for proc in P:
+        node[proc] = 0
+        comp[proc] = 0
+        memo[proc] = 0
+    for T in G.nodes():
+        node[G.nodes[T]['p']] += 1
+        comp[G.nodes[T]['p']] += G.nodes[T]['weight']
+        memo[G.nodes[T]['p']] += G.nodes[T]['memory']
+    for key in memo:
+        print(''.join(['P', str(key), ': ', str(node[key]), ' nodes, ', str(comp[key]), ' microseconds, ', str(memo[key]), ' bytes']))
+    return G, 0
+
+
