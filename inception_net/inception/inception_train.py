@@ -409,7 +409,8 @@ def train(dataset):
           print(format_str % (datetime.now(), step, loss_value,
                             examples_per_sec, duration))
 
-        if step == 1 and not os.path.isfile('timeline.json') and not os.path.isfile('timeline_memory.json'):                 fetched_timeline = timeline.Timeline(run_metadata.step_stats)
+        if step == 1 and not os.path.isfile('timeline.json') and not os.path.isfile('timeline_memory.json'):
+          fetched_timeline = timeline.Timeline(run_metadata.step_stats)
           chrome_trace = fetched_timeline.generate_chrome_trace_format()
           with open('timeline2.json', 'w') as f:
             f.write(chrome_trace)
