@@ -30,6 +30,7 @@ from tensorflow.python.client import timeline
 import image_processing
 import inception_model as inception
 from inception.slim import slim
+import simulate
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -365,7 +366,7 @@ def train(dataset):
 
     #device placement
     graph = tf.get_default_graph()
-    simulate.simulate(graph, 'topo', True, 4)
+    simulate.simulate(graph, 'sct', True, 4)
 
     print("hey good here")
 
@@ -395,12 +396,13 @@ def train(dataset):
         # See `tf.train.SyncReplicasOptimizer` for additional details on how to
         # perform *synchronous* training.
         start_time = time.time()
-        run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
-        run_metadata = tf.RunMetadata()
-        _, loss_value = sess.run([train_op, loss], options=run_options, run_metadata=run_metadata)
+        #run_options = tf.RunOptions(trace_level=tf.RunOptions.FULL_TRACE)
+        #run_metadata = tf.RunMetadata()
+        #_, loss_value = sess.run([train_op, loss], options=run_options, run_metadata=run_metadata)
+        _, loss_value = sess.run([train_op, loss])
         duration = time.time() - start_time
-        summary_writer.add_run_metadata(run_metadata, 'steps%03d' % step)
-        print("one iteration")
+        #summary_writer.add_run_metadata(run_metadata, 'steps%03d' % step)
+        #print("one iteration: " + duration)
 
         if step % 1 == 0:
           examples_per_sec = FLAGS.batch_size / float(duration)

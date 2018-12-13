@@ -99,6 +99,7 @@ def sct(_G, _P, max_size):
 	#main loop
 	time = 0
 	while(len(S) != G.number_of_nodes()):
+                print(len(S))
 		#calculate ready time and urgent time
 		for T in R:
 			for proc in P.nodes:

@@ -161,29 +161,22 @@ def simulate(graph, method, fix_total, arg):
         metadata = get_metadata(graph)
         _G,time,node_dict = partition(bandwidth, num_proc, metadata[0], metadata[1], metadata[2], metadata[3], fix_total, arg, method)
        
-        with open('graph_before.txt', 'w') as f:
-            for node in _G.nodes():
-                n = _G.nodes[node]
-                f.write(''.join([n['name'], ',', str(n['p'] - 1), ',', str(n['weight']), ',', str(n['memory']), '\n']))
-
  
         group_dict = {}
         for node in graph.get_operations():
             group = str(node.colocation_groups()[0])
             index = group.index("@")
-            group = group[index+1:-1]
+            #group = group[index+1:-1] #wierd
+            group = group[index+1:]
             group_dict[node.name] = group
 
-        f = open('graph_after.txt', 'w')
         for node in graph.get_operations():
-            index = node_dict[group_dict[node.name]]
-            pro = str(int(_G.nodes[index]['p']) - 1)
-            node._set_device(''.join(['/job:worker/task:', pro]))
-            
-
-            n = _G.nodes[node_dict[node.name]]
-            f.write(''.join([n['name'], ',', pro, ',', str(n['weight']), ',', str(n['memory']), '\n']))            
-        f.close()
+            if 'batch_processing' in node.name:
+                node._set_device('/job:worker/task:0')
+            else:
+                index = node_dict[group_dict[node.name]]
+                pro = str(int(_G.nodes[index]['p']) - 1)
+                node._set_device(''.join(['/job:worker/task:', pro]))
 
         for node in graph.get_operations():
             index = node_dict[node.name]
